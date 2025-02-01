@@ -1,12 +1,24 @@
 import { Link } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
+import ErrorMessage from '../components/ErrorMessage'
+import { RegisterForm } from '../types'
 
 export default function RegisterView() {
 
-    const { register, watch, handleSubmit, formState: {errors} } = useForm()
+    const initialValues : RegisterForm = {
+        name: '',
+        email: '',
+        handle: '',
+        password: '',
+        password_confirmation: ''
+    }
 
-    const handleRegister = () => {
-        console.log('Desde handleRegister')
+    const { register, watch, handleSubmit, formState: {errors} } = useForm({defaultValues : initialValues})
+
+    const password = watch('password')
+
+    const handleRegister = (formData : RegisterForm) => {
+        console.log(formData)
     }
 
     return (
@@ -27,20 +39,24 @@ export default function RegisterView() {
                             required: "El nombre es obligatorio"
                         })}
                     />
-                    {errors.name && String(errors.name.message)}
+                    {errors.name && <ErrorMessage>{errors.name.message}</ErrorMessage>}
                 </div>
                 <div className="grid grid-cols-1 space-y-3">
                     <label htmlFor="email" className="text-2xl text-slate-500">E-mail</label>
                     <input
                         id="email"
                         type="email"
-                        placeholder="Email de Registro"
+                        placeholder="E-mail de Registro"
                         className="bg-slate-100 border-none p-3 rounded-lg placeholder-slate-400"
                         {...register('email', {
-                            required: "El Email es obligatorio"
+                            required: "El E-mail es obligatorio",
+                            pattern: {
+                                value: /\S+@\S+\.\S+/,
+                                message:"E-mail no válido"
+                            }
                         })}
                     />
-                    {errors.email && String(errors.email.message)}
+                    {errors.email && <ErrorMessage>{errors.email.message}</ErrorMessage>}
                 </div>
                 <div className="grid grid-cols-1 space-y-3">
                     <label htmlFor="handle" className="text-2xl text-slate-500">Handle</label>
@@ -53,7 +69,7 @@ export default function RegisterView() {
                             required: "El handle es obligatorio"
                         })}
                     />
-                    {errors.handle && String(errors.handle.message)}
+                    {errors.handle && <ErrorMessage>{errors.handle.message}</ErrorMessage>}
                 </div>
                 <div className="grid grid-cols-1 space-y-3">
                     <label htmlFor="password" className="text-2xl text-slate-500">Password</label>
@@ -63,10 +79,14 @@ export default function RegisterView() {
                         placeholder="Password de Registro"
                         className="bg-slate-100 border-none p-3 rounded-lg placeholder-slate-400"
                         {...register('password', {
-                            required: "La contraseña es obligatoria"
+                            required: "La contraseña es obligatoria",
+                            minLength: {
+                                value: 8,
+                                message: "La contraseña debe ser mínimo de 8 caracteres"
+                            }
                         })}
                     />
-                    {errors.password && String(errors.password.message)}
+                    {errors.password && <ErrorMessage>{errors.password.message}</ErrorMessage>}
                 </div>
 
                 <div className="grid grid-cols-1 space-y-3">
@@ -76,11 +96,12 @@ export default function RegisterView() {
                         type="password"
                         placeholder="Repetir Password"
                         className="bg-slate-100 border-none p-3 rounded-lg placeholder-slate-400"
-                        {...register('password', {
-                            required: "La contraseña es obligatoria"
+                        {...register('password_confirmation', {
+                            required: "Verificar la contraseña es obligatorio",
+                            validate: (value) => value == password || "Las contraseñas no son iguales"
                         })}
                     />
-                    {errors.password && String(errors.password.message)}
+                    {errors.password_confirmation && <ErrorMessage>{errors.password_confirmation.message}</ErrorMessage>}
                 </div>
 
                 <input
